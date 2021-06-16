@@ -1,0 +1,14 @@
+//go:generate wire
+//+build wireinject
+
+package {package}
+
+import (
+	"github.com/google/wire"
+)
+
+func Initialize{name}() *{name} {
+	wire.Build(New{name}{inject})
+
+	return nil
+}

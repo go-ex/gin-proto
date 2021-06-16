@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package controllers;
+
+import "methods.proto";
+import "service.proto";
+import "home.proto";
+
+option go_package = "/controllers";
+
+service Login {
+	option (http.Route) = "login";
+
+	// User action
+	rpc User(HomeRequest)returns(HomeResponse){
+		option (http.Get) = "/api/login/user";
+	}
+
+	// 登陆
+	rpc Login(HomeRequest)returns(HomeResponse){
+		option (http.Get) = "/api/login";
+	}
+}

@@ -1,0 +1,22 @@
+#!/usr/bin/env php
+<?php
+
+require_once 'vendor/autoload.php';
+
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\SingleCommandApplication;
+
+define("project_path", dirname(__DIR__));
+
+(new SingleCommandApplication())
+    ->setName('goland to wire code') // Optional
+    ->setVersion('1.0.0') // Optional
+    ->addOption('bean_path', null, InputOption::VALUE_REQUIRED)
+    ->setCode(function (InputInterface $input, OutputInterface $output) {
+        (new \GoProto\Inject\InjectCommand($input, $output))->run();
+    })
+    ->run();
+

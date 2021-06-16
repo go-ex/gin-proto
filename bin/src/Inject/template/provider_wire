@@ -1,0 +1,15 @@
+//go:generate wire
+//+build wireinject
+
+package {package}
+
+import (
+	"github.com/google/wire"
+	{import}
+)
+
+func InitializeNew{struct}Provider() {*star}{struct} {
+	wire.Build(New{struct}Provider{inject})
+
+	return nil
+}

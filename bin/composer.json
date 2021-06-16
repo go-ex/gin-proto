@@ -1,0 +1,17 @@
+{
+    "name": "cyz/bin",
+    "autoload": {
+        "psr-4": {
+            "GoProto\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "ctfang",
+            "email": "2206582181@qq.com"
+        }
+    ],
+    "require": {
+        "symfony/console": "^5.3"
+    }
+}

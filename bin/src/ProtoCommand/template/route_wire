@@ -1,0 +1,17 @@
+//go:generate wire
+//+build wireinject
+
+package routes
+
+import (
+	"github.com/google/wire"
+	{import}
+)
+
+// 注入声明, 由工具生成
+// 不要修改
+func Get{-package-}Routes() *{-package-}Routes {
+	wire.Build(New{-package-}RoutesProvider{inject})
+
+	return nil
+}

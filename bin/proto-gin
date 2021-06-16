@@ -1,0 +1,23 @@
+#!/usr/bin/env php
+<?php
+
+require_once 'vendor/autoload.php';
+
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\SingleCommandApplication;
+
+// 项目路径
+define("project_path", dirname(__DIR__));
+
+(new SingleCommandApplication())
+    ->setName('proto to controller and route') // Optional
+    ->setVersion('1.0.0') // Optional
+    ->addOption('proto_path', null, InputOption::VALUE_REQUIRED, 'proto路径')
+    ->addOption('out_http', null, InputOption::VALUE_REQUIRED, '输出到目录')
+    ->setCode(function (InputInterface $input, OutputInterface $output) {
+        (new \GoProto\ProtoCommand\ProtoToController())->run($input, $output);
+    })
+    ->run();

@@ -1,0 +1,26 @@
+//go:generate wire
+//根据proto定义生成本文件
+//整个文件内容都不需要更改, 每次自动跟随proto定义更新
+
+package routes
+
+import (
+	"github.com/gin-gonic/gin"
+	http "github.com/go-ex/gin-proto/bootstrap/http/api"
+	{import}
+)
+
+// {-package-}Routes @bean
+type {-package-}Routes struct {
+	{controllers}
+}
+
+// New{-package-}RoutesProvider 提供者格式命名
+// New{-package-}RoutesProvider New{package}RoutesProvider
+func New{-package-}RoutesProvider(
+	{controllers-var}
+) *ControllersRoutes {
+	return &{-package-}Routes{
+		{route}
+	}
+}

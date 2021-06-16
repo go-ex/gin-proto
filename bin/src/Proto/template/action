@@ -1,0 +1,11 @@
+package {package}
+
+import (
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
+
+// {name} {doc}
+func (h *{service}) {name}(c *gin.Context) {
+	c.String(http.StatusOK,"{name}")
+}

@@ -1,0 +1,6 @@
+// Get{group}Routes Get{option (http.Route)}Routes
+func (c *{-package-}Routes) Get{group}Routes() map[*http.Config]func(c *gin.Context) {
+	return map[*http.Config]func(c *gin.Context){
+		{route}
+	}
+}
