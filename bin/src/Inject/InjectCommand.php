@@ -25,6 +25,10 @@ class InjectCommand
     {
         if (!$beanDirs) {
             $beanDirs = $this->input->getOption('bean_path');
+
+            if (!$beanDirs){
+                $beanDirs = getcwd();
+            }
         }
 
         foreach (scandir($beanDirs) as $v) {
