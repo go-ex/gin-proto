@@ -21,5 +21,6 @@ func NewHomeProvider(account *login.Account) *Home  {
 例如上面代码，函数名符合 New{struceName}Provider 的命名格式；
 
 `gin-inject` 工具就会解析该函数，直接为参数login.Account生成NewAccountProvider提供者，同时生成可被依赖提供函数。
+这些都是自动，无需关心。
 
 任何地方无脑用就可以了。完全使用php,laravel 的依赖注入习惯。
