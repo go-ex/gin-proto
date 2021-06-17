@@ -26,9 +26,10 @@ class InjectCommand
         if (!$beanDirs) {
             $beanDirs = $this->input->getOption('bean_path');
 
-            if (!$beanDirs){
+            if (!$beanDirs) {
                 $beanDirs = getcwd();
             }
+            $beanDirs = realpath($beanDirs);
         }
 
         foreach (scandir($beanDirs) as $v) {
@@ -91,6 +92,7 @@ class InjectCommand
                 $star = $param[0] == '*';
                 // 本包结构参数
                 $this->makeProvider(trim($param, '*'), $parser, $star);
+                $this->makeProviderWire(trim($param, '*'), $parser, $star);
             } else {
                 $star          = ($arr[0][0] == '*');
                 $packageName   = $star ? trim($arr[0], '*') : $arr[0];
@@ -123,25 +125,46 @@ class InjectCommand
      * @param  string  $structName
      * @param  Parser  $parser
      * @param  bool  $star
-     * @return bool
+     * @return bool true 新创建
      */
     private function makeProvider(string $structName, Parser $parser, bool $star): bool
     {
         $tempFunc = $parser->getFunc();
         if (!isset($tempFunc["New{$structName}Provider"])) {
-            $tempStruct   = $parser->getStruct();
-            $struct       = $tempStruct[$structName];
-            $providerCode = $this->getProviderCode();
-            $providerCode = str_replace(
-                ['{struct}', '{*star}', '{&star}'],
-                [$structName, $star ? '*' : "", $star ? '&' : ""],
-                $providerCode
-            );
-            File::insert($parser->getFile(), PHP_EOL.PHP_EOL."{$providerCode}".PHP_EOL, $struct->getEndLine());
-
-            return true;
+            $tempStruct = $parser->getStruct();
+            if (isset($tempStruct[$structName])) {
+                $struct       = $tempStruct[$structName];
+                $providerCode = $this->getProviderCode();
+                $providerCode = str_replace(
+                    ['{struct}', '{*star}', '{&star}'],
+                    [$structName, $star ? '*' : "", $star ? '&' : ""],
+                    $providerCode
+                );
+                File::insert($parser->getFile(), PHP_EOL.PHP_EOL."{$providerCode}".PHP_EOL, $struct->getEndLine());
+                return true;
+            } else {
+                // 查看其他文件是否存在
+                $dir             = dirname($parser->getFile());
+                $checkTempParser = $this->getStructParser($structName, $dir);
+                $this->makeProvider($structName, $checkTempParser, true);
+                $this->makeProviderWire($structName, $checkTempParser, true);
+            }
         }
         return false;
+    }
+
+    public function getStructParser(string $structName, $dir): Parser
+    {
+        foreach (scandir($dir) as $fileName) {
+            $file = $dir.'/'.$fileName;
+            if (!in_array($fileName, ['.', '..'])) {
+                $checkTempParser = new Parser($file);
+                $tempStruct      = $checkTempParser->getStruct();
+                if (isset($tempStruct[$structName])) {
+                    return $checkTempParser;
+                }
+            }
+        }
     }
 
     /**
@@ -151,13 +174,20 @@ class InjectCommand
      */
     private function makeProviderWire(string $structName, Parser $parser, bool $star)
     {
-        $file = $parser->getFile();
-        $file = str_replace(['.go'], ['.wire.go'], $file);
+        $file     = $parser->getFile();
+        $file     = str_replace(['.go'], ['.wire.go'], $file);
+        $tempFunc = $parser->getFunc();
 
-        $tempFunc   = $parser->getFunc();
-        $tempStruct = $parser->getStruct();
-        $struct     = $tempStruct[$structName];
-        $func       = $tempFunc["New{$structName}Provider"];
+        $funcProviderName = "New{$structName}Provider";
+        if (isset($tempFunc[$funcProviderName])) {
+            $func = $tempFunc[$funcProviderName];
+        } else {
+            $parser   = $this->getStructParser($structName, dirname($parser->getFile()));
+            $file     = $parser->getFile();
+            $file     = str_replace(['.go'], ['.wire.go'], $file);
+            $tempFunc = $parser->getFunc();
+            $func     = $tempFunc[$funcProviderName];
+        }
 
         $allImport = [];
         foreach ($parser->getImports() as $import) {
@@ -172,19 +202,22 @@ class InjectCommand
         foreach ($func->getParams() as $param) {
             $arr = explode('.', $param);
             if (count($arr) == 1) {
-                $inject[]    = "InitializeNew{$param}Provider";
-                $alias       = $parser->getPackage();
                 $paramStruct = trim($param, '*');
+                $inject[]    = "InitializeNew{$paramStruct}Provider";
+                $alias       = $parser->getPackage();
                 $paramStar   = $param != $paramStruct;
             } else {
                 $alias          = trim($arr[0], '*');
-                $inject[]       = "{$alias}.InitializeNew{$arr[1]}Provider";
+                $paramStruct    = trim($arr[1], '*');
+                $inject[]       = "{$alias}.InitializeNew{$paramStruct}Provider";
                 $import[$alias] = '"'.$allImport[$alias].'"';
                 $paramStar      = $alias != $arr[0];
-                $paramStruct    = $arr[1];
             }
             // 多级依赖参数
-            $this->checkOtherPackage($allImport[$alias], $paramStruct, $paramStar);
+            if(isset($allImport[$alias])){
+                $otherPackage = $allImport[$alias];
+                $this->checkOtherPackage($otherPackage, $paramStruct, $paramStar);
+            }
         }
         $providerCode = str_replace(
             ['{package}', '{import}', '{struct}', '{*star}', '{&star}', '{inject}'],

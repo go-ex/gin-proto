@@ -6,7 +6,7 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	http "github.com/go-ex/gin-proto/bootstrap/http/api"
+	http "gitlab.service.com.int/st.werewolf/lrs-circle-server/bootstrap/http/api"
 	{import}
 )
 

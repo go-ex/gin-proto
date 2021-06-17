@@ -1,4 +1,5 @@
 GOBIN := $(shell go env GOBIN)
+ATDIR := $(shell pwd)
 
 # 按照代码工具
 # vim ~/.bash_profile
@@ -12,7 +13,7 @@ install:
 # 安装自动更新依赖wire文件
 # 需要执行权限
 install-php-inject:
-	ln -s -f /Users/cyz/Desktop/gin-proto/gin-server/bin/go-inject $(GOBIN)/gin-inject
+	ln -s -f $(ATDIR)/bin/go-inject $(GOBIN)/gin-inject
 
 protoc:
 	protoc --proto_path=./proto/http \

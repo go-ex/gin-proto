@@ -6,10 +6,10 @@ namespace GoProto\Golang;
 
 class ParserFunc
 {
-    protected string $name = '';
+    protected $name = '';
     protected $startLine = 0;
     protected $endLine = 0;
-    protected string $structName = '';
+    protected $structName = '';
     protected $doc = '';
     protected $params = [];
     protected $returnStr = '';

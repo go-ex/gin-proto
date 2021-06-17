@@ -32,10 +32,10 @@ class File
             if ($i == $iLine) {
                 $checkIndex = $index;
                 if ($index == -1) {
-                    $checkIndex = strlen($line) - 1;
+                    $checkIndex = strlen($line) + 1;
                 }
 
-                if ($checkIndex == strlen($line) - 1) {
+                if ($checkIndex == strlen($line)) {
                     $arr[] = substr($line, 0, strlen($line) - 1).$s;
                 } else {
                     $arr[] = substr($line, 0, $checkIndex).$s.substr($line, $checkIndex);
